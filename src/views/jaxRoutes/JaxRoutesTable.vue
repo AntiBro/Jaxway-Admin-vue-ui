@@ -5,8 +5,6 @@
 			<el-form :inline="true" >
 				<el-form-item label="选择JaxwayServer">
 					<el-select v-model="jaxwayServerId" placeholder="请选择 Jaxway Server" @change="selectjaxServerTrigger(jaxwayServerId)">
-						<!-- <el-option label="普通用户" value="0"></el-option>
-						<el-option label="管理员" value="1"></el-option> -->
 						<el-option
 						v-for="(item,index) in jaxServerOptions"
 						:key="item.value"
@@ -29,7 +27,7 @@
 			</el-table-column>
 			<el-table-column type="index" width="40">
 			</el-table-column>
-			<el-table-column prop="url" label="Url" width="180" sortable>
+			<el-table-column prop="url" label="Url" min-width="180" sortable>
 			</el-table-column>
 			<el-table-column prop="predicateType" label="predicate类型" width="120"  sortable>
 			</el-table-column>
@@ -58,34 +56,6 @@
 			</el-pagination>
 		</el-col>
 
-		<!--编辑界面-->
-		<el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
-			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
-				<el-form-item label="姓名" prop="name">
-					<el-input v-model="editForm.name" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="性别">
-					<el-radio-group v-model="editForm.sex">
-						<el-radio class="radio" :label="1">男</el-radio>
-						<el-radio class="radio" :label="0">女</el-radio>
-					</el-radio-group>
-					
-				</el-form-item>
-				<el-form-item label="年龄">
-					<el-input-number v-model="editForm.age" :min="0" :max="200"></el-input-number>
-				</el-form-item>
-				<el-form-item label="生日">
-					<el-date-picker type="date" placeholder="选择日期" v-model="editForm.birth"></el-date-picker>
-				</el-form-item>
-				<el-form-item label="地址">
-					<el-input type="textarea" v-model="editForm.addr"></el-input>
-				</el-form-item>
-			</el-form>
-			<div slot="footer" class="dialog-footer">
-				<el-button @click.native="editFormVisible = false">取消</el-button>
-				<el-button type="primary" @click.native="editSubmit" :loading="editLoading">提交</el-button>
-			</div>
-		</el-dialog>
 
 		<!--新增路由界面-->
 		<el-dialog title="新增 Route" v-model="addFormVisible" :close-on-click-modal="false">
@@ -137,7 +107,7 @@
 <script>
 	import util from '../../common/js/util'
 	//import NProgress from 'nprogress'
-	import { getUserListPage, removeRouteDefinition, batchRemoveUser, editUser, addUser, getPredicatesInfos,getFilterInfos,addRouteDefinition,getJaxwayServers,getJaxwayServersRoutesInfo } from '../../api/api';
+	import { removeRouteDefinition, getPredicatesInfos,getFilterInfos,addRouteDefinition,getJaxwayServers,getJaxwayServersRoutesInfo } from '../../api/api';
 
 	export default {
 		data() {
@@ -146,32 +116,12 @@
 				jaxServerOptions:[],
 				filterTypes:[],
 				jaxwayServerId: '',
-				filters: {
-					name: ''
-				},
 				RouteInfo: [],
-				users: [],
+
 				total: 0,
 				page: 1,
 				listLoading: false,
-				sels: [],//列表选中列
-
-				editFormVisible: false,//编辑界面是否显示
-				editLoading: false,
-				editFormRules: {
-					name: [
-						{ required: true, message: '请输入姓名', trigger: 'blur' }
-					]
-				},
-				//编辑界面数据
-				editForm: {
-					id: 0,
-					routeId: '',
-					predicatesType: '',
-					predicatesValue: '/',
-					filterType: '',
-					filterValue: '1'
-				},
+				sels: [],//列表选中列	
 
 				addFormVisible: false,//新增界面是否显示
 				addLoading: false,
@@ -210,29 +160,7 @@
 			}
 		},
 		methods: {
-			//性别显示转换
-			formatSex: function (row, column) {
-				return row.sex == 1 ? '男' : row.sex == 0 ? '女' : '未知';
-			},
-			handleCurrentChange(val) {
-				this.page = val;
-				this.getUsers();
-			},
-			//获取用户列表
-			getUsers() {
-				let para = {
-					page: this.page,
-					name: this.filters.name
-				};
-				this.listLoading = true;
-				//NProgress.start();
-				getUserListPage(para).then((res) => {
-					this.total = res.data.total;
-					this.users = res.data.users;
-					this.listLoading = false;
-					//NProgress.done();
-				});
-			},
+			
 			//删除
 			handleDelRoute: function (index, row) {
 				this.$confirm('确认删除该记录吗?', '提示', {
@@ -264,11 +192,6 @@
 
 				});
 			},
-			//显示编辑界面
-			handleEdit: function (index, row) {
-				this.editFormVisible = true;
-				this.editForm = Object.assign({}, row);
-			},
 			//显示新增界面
 			handleAddRoute: function () {
 				if(this.jaxwayServerId == null || this.jaxwayServerId == ''){
@@ -286,30 +209,6 @@
 					birth: '',
 					addr: ''
 				};
-			},
-			//编辑
-			editSubmit: function () {
-				this.$refs.editForm.validate((valid) => {
-					if (valid) {
-						this.$confirm('确认提交吗？', '提示', {}).then(() => {
-							this.editLoading = true;
-							//NProgress.start();
-							let para = Object.assign({}, this.editForm);
-							para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
-							editUser(para).then((res) => {
-								this.editLoading = false;
-								//NProgress.done();
-								this.$message({
-									message: '提交成功',
-									type: 'success'
-								});
-								this.$refs['editForm'].resetFields();
-								this.editFormVisible = false;
-								this.getUsers();
-							});
-						});
-					}
-				});
 			},
 			//新增
 			addRouteSubmit: function () {
@@ -418,6 +317,7 @@
 					}
 				});
 			},
+			// 获取Jaxway Server 对应的最终路由信息
 			getJaxwayServersRoutesInfo:function(id){
 				let params={"jaxwayServerId":id};
 				this.listLoading = true;
