@@ -3,7 +3,7 @@
 		<!--工具条-->
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
 			<el-form :inline="true" >
-				<el-form-item label="选择JaxwayServer">
+				<!-- <el-form-item label="选择JaxwayServer">
 					<el-select v-model="jaxwayServerId" placeholder="请选择 Jaxway Server" @change="selectjaxServerTrigger(jaxwayServerId)">
 						<el-option
 						v-for="(item,index) in jaxServerOptions"
@@ -12,9 +12,9 @@
 						:value="item.value">
 						</el-option>
 					</el-select>
-				</el-form-item>
+				</el-form-item> -->
 				<el-form-item>
-					<el-button type="primary" @click="handleAddRoute">新建路由</el-button>
+					<el-button type="primary" @click="handleAddJaxwayServer">新建路由</el-button>
 				</el-form-item>
 			</el-form>
 
@@ -22,22 +22,17 @@
 		</el-col>
 
 		<!--列表-->
-		<el-table :data="RouteInfo" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;">
+		<el-table :data="jaxwayServerInfos" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;">
 			<el-table-column type="selection" width="40">
 			</el-table-column>
 			<el-table-column type="index" width="40">
 			</el-table-column>
-			<el-table-column prop="url" label="Url" min-width="180" sortable>
+			<el-table-column prop="id" label="JaxwayServer ID" min-width="80" sortable>
 			</el-table-column>
-			<el-table-column prop="predicateType" label="predicate类型" width="120"  sortable>
+			<el-table-column prop="jaxwayName" label="jaxwayServer Name" width="200"  sortable>
 			</el-table-column>
-			<el-table-column prop="predicateValue" label="predicete值" width="180" sortable>
-			</el-table-column>
-				<el-table-column prop="filterType" label="filter类型" width="120"  sortable>
-			</el-table-column>
-			<el-table-column prop="filterValue" label="filter值" width="180" sortable>
-			</el-table-column>
-			<el-table-column prop="createUserId" label="创建用户Id" width="180" sortable>
+			<el-table-column prop="jaxwayDespc" label="描述" width="180" sortable></el-table-column>
+			<el-table-column prop="userName" label="创建用户Id" width="180" sortable>
 			</el-table-column>
 			<el-table-column prop="updateTime" label="更新时间" min-width="100" sortable>
 			</el-table-column>
@@ -112,6 +107,7 @@
 	export default {
 		data() {
 			return {
+				jaxwayServerInfos:[],
 				predicateTypes:[],
 				jaxServerOptions:[],
 				filterTypes:[],
@@ -162,7 +158,7 @@
 		methods: {
 			handleCurrentChange(val) {
 				this.page = val;
-				//this.getUsers();
+				this.getUsers();
 			},
 			//删除
 			handleDelRoute: function (index, row) {
@@ -196,14 +192,8 @@
 				});
 			},
 			//显示新增界面
-			handleAddRoute: function () {
-				if(this.jaxwayServerId == null || this.jaxwayServerId == ''){
-						this.$message({
-							message: '请先选择Jaxway Server',
-							type: 'error'
-						});
-						return;
-				}
+			handleAddJaxwayServer: function () {
+			
 				this.addFormVisible = true;
 			
 			},
@@ -268,75 +258,21 @@
 
 				});
 			},
-			// 选中 JaxwayServer 事件
-			selectjaxServerTrigger:function(id){
-				console.log("选中id="+id)
-				this.getJaxwayServersRoutesInfo(id);
-				
-			},
-			// 查看 predicate 和filter信息
-			getPredicatesAndFilterInfos: function(){
-				getPredicatesInfos().then(data=>{
-					let { status, code, body } = data;
-					if(code == 200){
-						body.forEach(element => {
-							let option = {};
-							option.label = element.name;
-							option.value = element.name;
-							this.predicateTypes.push(option);
-						});
-					}
-				});
-				getFilterInfos().then(data=>{
-					let { status, code, body } = data;
-					if(code == 200){
-						body.forEach(element => {
-							let option = {};
-							option.label = element.name;
-							option.value = element.name;
-							this.filterTypes.push(option);
-						});
-					}
-				});
-
-			},
+		
 			// 查看用户所拥有的 Jaxway Server
 			getJaxwayServers: function(){
+				this.listLoading = true;
 				getJaxwayServers().then(data=>{
 					let { status, code, body } = data;
 					if(code == 200){
-						body.forEach(element => {
-							let option = {};
-							option.label = element.jaxwayName;
-							option.value = element.id;
-							this.jaxServerOptions.push(option);
-						});
+						this.jaxwayServerInfos = body
 					}
+						this.listLoading = false;
 				});
-			},
-			// 获取Jaxway Server 对应的最终路由信息
-			getJaxwayServersRoutesInfo:function(id){
-				let params={"jaxwayServerId":id};
-				this.listLoading = true;
-
-				getJaxwayServersRoutesInfo(params).then(data=>{
-					let { status, code, body } = data;
-					if(code == 200){
-						this.RouteInfo = body;
-					}else{
-						this.$message({
-							message: body,
-							type: 'error'
-						});
-					}
-					this.listLoading = false;
-					console.log("routeinfos"+data);
-				})
-			},
+			}
 		},
 		mounted() {
 			this.getJaxwayServers();
-			this.getPredicatesAndFilterInfos();
 		}
 	}
 

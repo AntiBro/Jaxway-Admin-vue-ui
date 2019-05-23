@@ -11,6 +11,7 @@ import Page6 from './views/nav3/Page6.vue'
 import echarts from './views/charts/echarts.vue'
 import adminAddUser from './views/user/adduser.vue'
 
+import jaxwayServerTable from './views/jaxwayServer/jaxwayServerTable.vue'
 import jaxwayRoute from './views/jaxRoutes/JaxRoutesTable.vue'
 
 let routes = [
@@ -34,7 +35,7 @@ let routes = [
        // iconCls: 'el-icon-message',//图标样式class
         children: [
             { path: '/main', component: Main, name: '主页', hidden: true },
-            { path: '/table', component: Table, name: 'Table' },
+            { path: '/jaxwayServerTable', component: jaxwayServerTable, name: 'Jaxway-Server 列表' },
             { path: '/form', component: Form, name: 'Form' },
             { path: '/user', component: user, name: '列表' },
         ]

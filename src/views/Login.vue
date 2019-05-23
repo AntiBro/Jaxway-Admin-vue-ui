@@ -71,7 +71,7 @@ let Base64 = require('js-base64').Base64;
                 else{
                   this.$router.options.routes[7].hidden = true;
                 }
-                this.$router.push({ path: '/table' });
+                this.$router.push({ path: '/jaxwayServerTable' });
               }
             });
           } else {
