@@ -37,7 +37,7 @@
 			</el-table-column>
 			<el-table-column prop="filterValue" label="filter值" width="180" sortable>
 			</el-table-column>
-			<el-table-column prop="createUserId" label="创建用户Id" width="180" sortable>
+			<el-table-column prop="userName" label="创建用户Id" width="180" sortable>
 			</el-table-column>
 			<el-table-column prop="updateTime" label="更新时间" min-width="100" sortable>
 			</el-table-column>
