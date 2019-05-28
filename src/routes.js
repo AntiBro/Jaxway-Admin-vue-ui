@@ -36,8 +36,8 @@ let routes = [
         children: [
             { path: '/main', component: Main, name: '主页', hidden: true },
             { path: '/jaxwayServerTable', component: jaxwayServerTable, name: 'Jaxway-Server 列表' },
-            { path: '/form', component: Form, name: 'Form' },
-            { path: '/user', component: user, name: '列表' },
+            // { path: '/form', component: Form, name: 'Form' },
+            // { path: '/user', component: user, name: '列表' },
         ]
     },
     {
